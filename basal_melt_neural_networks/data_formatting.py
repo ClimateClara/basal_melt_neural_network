@@ -21,7 +21,7 @@ def prepare_input_df_1_year(TS_prof_isf, melt_rate_isf, yy, max_front_depth, geo
     
     # Geometry info to dataframe
     length_df = len(geometry_2D_isf.x)*len(geometry_2D_isf.y)
-    geo_df = geometry_2D_isf.drop('x').drop('y').to_dataframe()
+    geo_df = geometry_2D_isf.to_dataframe()
     
     # Write the T and S profiles in different columns for this year (all rows the same)
     
@@ -42,7 +42,7 @@ def prepare_input_df_1_year(TS_prof_isf, melt_rate_isf, yy, max_front_depth, geo
     # write out melt rate for that year (target)
     melt_rate_isf_tt = melt_rate_isf.sel(time=yy)
     # transform to dataframe
-    melt_df = melt_rate_isf_tt.drop('x').drop('y').drop('longitude').drop('latitude').to_dataframe().drop(['mapping'],axis=1).reset_index()
+    melt_df = melt_rate_isf_tt.drop('longitude').drop('latitude').to_dataframe().drop(['mapping'],axis=1)#.reset_index()
     if only_1_yr_tot:
         melt_df = melt_df.drop(['time'],axis=1)
     
