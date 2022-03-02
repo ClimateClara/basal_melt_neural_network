@@ -42,7 +42,7 @@ def prepare_input_df_1_year(TS_prof_isf, melt_rate_isf, yy, max_front_depth, geo
     # write out melt rate for that year (target)
     melt_rate_isf_tt = melt_rate_isf.sel(time=yy)
     # transform to dataframe
-    melt_df = melt_rate_isf_tt.drop('longitude').drop('latitude').to_dataframe().drop(['mapping'],axis=1)#.reset_index()
+    melt_df = melt_rate_isf_tt.drop('longitude').drop('latitude').to_dataframe()#.drop(['mapping'],axis=1)#.reset_index()
     if only_1_yr_tot:
         melt_df = melt_df.drop(['time'],axis=1)
     
