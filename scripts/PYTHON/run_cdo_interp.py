@@ -10,9 +10,13 @@ from tqdm.notebook import tqdm
 
 cdo = Cdo()
 
-nemo_run = 'OPM027'
+#nemo_run = 'OPM027'
+#yy_start = 1999 
+#yy_end = 2038
+
+nemo_run = 'OPM031'
 yy_start = 1999 
-yy_end = 2038
+yy_end = 2068
 
 inputpath_mask = '/bettik/mathiotp/NEMO/DRAKKAR/eORCA025.L121/eORCA025.L121-'+nemo_run+'-MSH/'
 inputpath_data = '/bettik/mathiotp/NEMO/DRAKKAR/eORCA025.L121/eORCA025.L121-'+nemo_run+'-S/'
