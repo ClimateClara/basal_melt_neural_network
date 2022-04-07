@@ -54,3 +54,21 @@ def prepare_input_df_1_year(TS_prof_isf, melt_rate_isf, yy, max_front_depth, geo
     # remove the x and y axis
     # clean_df = clean_df.drop(['x'], axis=1).drop(['y'], axis=1)
     return clean_df, T_list, S_list
+
+
+def weighted_mean(data, dims, weights):
+    return (data*weights).sum(dim=dims)/weights.sum(dim=dims)
+
+def create_stacked_mask(isfmask_2D, nisf_list, dims_to_stack, new_dim):
+    # create stacked indices to select the different ice shelves
+    # based on https://xarray.pydata.org/en/stable/indexing.html#more-advanced-indexing
+    stacked_mask = isfmask_2D.stack(z=(dims_to_stack))
+    
+    new_coord_mask = stacked_mask.z.where(stacked_mask==nisf_list).dropna(how='all',dim='z')  
+    new_coord_mask = new_coord_mask.rename({'z': new_dim})
+    
+    return new_coord_mask
+
+def choose_isf(var, isf_stacked_mask, kisf):
+    # choose a given ice shelf based on stacked coordinate
+    return var.stack(mask_coord=['y','x']).sel(mask_coord=isf_stacked_mask.sel(Nisf=kisf).dropna('mask_coord'))
