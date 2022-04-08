@@ -15,7 +15,7 @@ cdo = Cdo()
 #yy_end = 2038
 
 nemo_run = 'OPM031'
-yy_start = 1999 
+yy_start = 2038 #1999 
 yy_end = 2068
 
 inputpath_mask = '/bettik/mathiotp/NEMO/DRAKKAR/eORCA025.L121/eORCA025.L121-'+nemo_run+'-MSH/'

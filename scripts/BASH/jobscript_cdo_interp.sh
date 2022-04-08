@@ -7,7 +7,7 @@ path_jobid=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/JOB_STD_O
 
 nemo_run=OPM031
 
-i=interp
+i=interp_suite
 
 cat << EOF > $path_jobscripts/${nemo_run}_${i}.sh
 
