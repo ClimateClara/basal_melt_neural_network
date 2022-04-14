@@ -329,15 +329,15 @@ def slope_zonal_merid(kisf, plume_var_of_int, ice_draft_neg, dx, dy):
     
     # cut out the ice shelf of interest
     draft_isf = ice_draft_neg.where(plume_var_of_int['ISF_mask'] == kisf, drop=True)
-    lon_isf = file_isf['longitude'].where(plume_var_of_int['ISF_mask'] == kisf, drop=True)
+    lon_isf = plume_var_of_int['longitude'].where(plume_var_of_int['ISF_mask'] == kisf, drop=True)
     
     shiftedx_minus = draft_isf.shift(x=-1)
     shiftedx_plus = draft_isf.shift(x=1)
-    xslope = dfmt.check_slope_one_dimension(draft_isf, shiftedx_plus, shiftedx_minus, dx)
+    xslope = check_slope_one_dimension(draft_isf, shiftedx_plus, shiftedx_minus, dx)
 
     shiftedy_minus = draft_isf.shift(y=-1)
     shiftedy_plus = draft_isf.shift(y=1)
-    yslope = dfmt.check_slope_one_dimension(draft_isf, shiftedy_plus, shiftedy_minus, dy)
+    yslope = check_slope_one_dimension(draft_isf, shiftedy_plus, shiftedy_minus, dy)
         
     dr = np.pi/180.
     #deltaphi = 90. - GEddxx !Geddxx= 90° in my config
