@@ -356,3 +356,21 @@ def slope_zonal_merid(kisf, plume_var_of_int, ice_draft_neg, dx, dy):
     zonal_slope_whole_grid = v_lat.reindex_like(plume_var_of_int['ISF_mask'])
     
     return merid_slope_whole_grid, zonal_slope_whole_grid
+
+def print_shape_xr_ds(ds):
+    
+    """
+    Write out dimensions of an xarray Dataset (index, variables)
+    
+    Parameters
+    ----------
+    ds: xr.Dataset
+        Dataset with a given amount of variables and the dimension ``index``
+        
+    Returns
+    -------
+    Tuple with the length of index and number of variables
+        
+    """
+    
+    return (len(ds.index),len(ds.data_vars.keys()))
