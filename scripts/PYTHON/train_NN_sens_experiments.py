@@ -32,8 +32,8 @@ inputpath_data = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/'
 outputpath_nn_models = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'
 outputpath_doc = '/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/custom_doc/'
 
-timetag = '20220427-1021'
-mod_size = 'small' #'mini', 'small', 'medium', 'large'
+timetag = '20220427-1051'
+mod_size = 'large' #'mini', 'small', 'medium', 'large'
 
 new_path_model = outputpath_nn_models+timetag+'/'
 if not os.path.isdir(new_path_model):
