@@ -77,6 +77,7 @@ target/
 
 # exclude data from source control by default
 /data/
+/scripts/JOB_STD_OUTPUT/
 # I want to be able to handle links in here...need to exclude certain file types
 # instead
 
