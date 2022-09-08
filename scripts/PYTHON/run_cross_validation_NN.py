@@ -11,23 +11,12 @@ import xarray as xr
 import pandas as pd
 from tqdm.notebook import trange, tqdm
 import glob
-import matplotlib as mpl
-import seaborn as sns
 import datetime
 import time
 import sys
 
-from dask import delayed
-
-import distributed
-
 import tensorflow as tf
 from tensorflow import keras
-from contextlib import redirect_stdout
-
-from basal_melt_neural_networks.constants import *
-import basal_melt_neural_networks.diagnostic_functions as diag
-import basal_melt_neural_networks.data_formatting as dfmt
 import basal_melt_neural_networks.model_functions as modf
 
 ######### READ IN OPTIONS
@@ -118,6 +107,6 @@ timelength = time_end - time_start
 # convert the history.history dict to a pandas DataFrame:     
 hist_df = pd.DataFrame(history.history) 
 
-hist_csv_file = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/TEMPORARY/history_test.csv'
+hist_csv_file = path_model + 'history_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.csv'
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
