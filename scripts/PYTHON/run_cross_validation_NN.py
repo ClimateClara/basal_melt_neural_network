@@ -102,7 +102,7 @@ timelength = time_end - time_start
 #    file.write('\n Reduce_lr: True')
 #    file.write('\n Early_stop: True')
 #    file.write('\n Training time (in s): '+str(timelength))
-#model.save(new_path_model + 'model_nn_'+timetag+'.h5')
+model.save(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
 
 # convert the history.history dict to a pandas DataFrame:     
 hist_df = pd.DataFrame(history.history) 
