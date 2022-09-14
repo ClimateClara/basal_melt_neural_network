@@ -12,10 +12,10 @@ norm_method=std # std, interquart, minmax
 #isf_out=$ii
 isf_out=00
 
-for tt in {01..13}
-do
-tblock_out=$tt
-#tblock_out=00
+#for tt in {01..13}
+#do
+#tblock_out=$tt
+tblock_out=13
 
 path_jobscripts=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_SCRIPTS
 path_outfiles=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_OUTFILES
@@ -33,7 +33,7 @@ EOF
 
 chmod +x $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.sh
 
-oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.e%jobid% -l nodes=1/core=2,walltime=06:00:00 --project ice_speed -p "network_address='luke62'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.sh
+oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.e%jobid% -l nodes=1/core=2,walltime=09:00:00 --project ice_speed -p "network_address='luke62'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}.sh
 
 # to remove if no CV!!!
 done
