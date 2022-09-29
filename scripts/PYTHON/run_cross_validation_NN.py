@@ -18,6 +18,8 @@ import sys
 import tensorflow as tf
 from tensorflow import keras
 import basal_melt_neural_networks.model_functions as modf
+import basal_melt_neural_networks.prep_input_data as indat
+
 
 ######### READ IN OPTIONS
 
@@ -52,17 +54,54 @@ elif TS_opt == 'whole':
     inputpath_CVinput = inputpath_data+'WHOLE_PROF_CHUNKS_CV/'
 elif TS_opt == 'thermocline':
     inputpath_CVinput = inputpath_data+'THERMOCLINE_CHUNKS_CV/'
+
+if TS_opt == 'extrap':
+    data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')   
     
-data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
-data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')   
-
-## prepare input and target
+    ## prepare input and target
             
-y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
+    x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
 
-y_val_norm = data_val_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    y_val_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
+    x_val_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+
+elif TS_opt == 'whole':
+    data_train1_list = []
+    data_val1_list = []
+    
+    for tblock_out in tqdm(tblock_dim):
+        isf_out = 0
+        data_train_norm_CVtime, data_val_norm_CVtime = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
+        data_train1_list.append(data_train_norm_CVtime)
+        data_val1_list.append(data_val_norm_CVtime)
+        data_train_merged_tblock = xr.concat(data_train1_list, dim='time')
+        data_val_merged_tblock = xr.concat(data_val1_list, dim='time')
+
+    data_train2_list = [data_train_merged_tblock]
+    data_val2_list = [data_val_merged_tblock]
+    
+    for isf_out in tqdm(isf_dim):
+        tblock_out = 0
+        data_train_norm_CVisf, data_val_norm_CVisf = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
+        data_train2_list.append(data_train_norm_CVisf)
+        data_val2_list.append(data_val_norm_CVisf)
+        data_train_merged_isf = xr.concat(data_train2_list, dim='Nisf')
+        data_val_merged_isf = xr.concat(data_val2_list, dim='Nisf')
+
+    ## prepare input and target
+            
+    y_train_norm = data_train_merged_isf['melt_m_ice_per_y'].load()
+    x_train_norm = data_train_merged_isf.drop_vars(['melt_m_ice_per_y']).to_array().load()
+
+    y_val_norm = data_train_merged_isf['melt_m_ice_per_y'].load()
+    x_val_norm = data_train_merged_isf.drop_vars(['melt_m_ice_per_y']).to_array().load()
+    
+else:
+    print('Sorry, I dont know this option for TS input yet, you need to implement it...')
+
+
 
 
 ######### TRAIN THE MODEL
