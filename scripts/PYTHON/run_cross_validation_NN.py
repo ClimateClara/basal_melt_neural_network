@@ -35,6 +35,9 @@ inputpath_data = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/'
 outputpath_nn_models = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'
 outputpath_doc = '/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/custom_doc/'
 
+tblock_dim = range(1,14)
+isf_dim = [10,11,12,13,18,22,23,24,25,30,31,33,38,39,40,42,43,44,45,47,48,51,52,53,54,55,58,61,65,66,69,70,71,73,75]
+
 if (tblock_out > 0) and (isf_out == 0):
     path_model = outputpath_nn_models+'CV_TBLOCK/'
     
@@ -68,27 +71,9 @@ if TS_opt == 'extrap':
     x_val_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
 
 elif TS_opt == 'whole':
-    data_train1_list = []
-    data_val1_list = []
-    
-    for tblock_out in tqdm(tblock_dim):
-        isf_out = 0
-        data_train_norm_CVtime, data_val_norm_CVtime = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
-        data_train1_list.append(data_train_norm_CVtime)
-        data_val1_list.append(data_val_norm_CVtime)
-        data_train_merged_tblock = xr.concat(data_train1_list, dim='time')
-        data_val_merged_tblock = xr.concat(data_val1_list, dim='time')
 
-    data_train2_list = [data_train_merged_tblock]
-    data_val2_list = [data_val_merged_tblock]
-    
-    for isf_out in tqdm(isf_dim):
-        tblock_out = 0
-        data_train_norm_CVisf, data_val_norm_CVisf = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
-        data_train2_list.append(data_train_norm_CVisf)
-        data_val2_list.append(data_val_norm_CVisf)
-        data_train_merged_isf = xr.concat(data_train2_list, dim='Nisf')
-        data_val_merged_isf = xr.concat(data_val2_list, dim='Nisf')
+    print(tblock_out)
+    data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
 
     ## prepare input and target
             
