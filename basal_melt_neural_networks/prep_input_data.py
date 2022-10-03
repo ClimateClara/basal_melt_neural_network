@@ -305,10 +305,13 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     ## which profile option are we using for temperature and salinity
     if TS_opt == 'extrap':
         inputpath_prof = inputpath_data+'EXTRAPOLATED_ISFDRAFT_CHUNKS/'
+        inputpath_metrics = inputpath_data+'EXTRAPOLATED_ISFDRAFT_CHUNKS_CV/'
     elif TS_opt == 'whole':
         inputpath_prof = inputpath_data+'WHOLE_PROF_CHUNKS/'
+        inputpath_metrics = inputpath_data+'WHOLE_PROF_CHUNKS_CV/'
     elif TS_opt == 'thermocline':
         inputpath_prof = inputpath_data+'THERMOCLINE_CHUNKS/'
+        inputpath_metrics = inputpath_data+'THERMOCLINE_CHUNKS_CV/'
 
     ### prepare training dataset
 
@@ -365,7 +368,7 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     y_val = val_input_df['melt_m_ice_per_y']
     x_val = val_input_df.drop_vars(['melt_m_ice_per_y'])
 
-    summary_ds_all = xr.open_dataset('metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    summary_ds_all = xr.open_dataset(inputpath_metrics + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     
     var_mean = summary_ds_all.sel(metric='mean_vars', norm_method=norm_method)
     var_range = summary_ds_all.sel(metric='range_vars', norm_method=norm_method)
