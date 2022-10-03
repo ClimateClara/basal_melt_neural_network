@@ -318,7 +318,8 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     train_input_df = None        
 
     for tt in tblock_list:
-
+        print('train',tt)
+        
         for kisf in isf_list: 
 
             clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
@@ -346,9 +347,10 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     val_input_df = None        
 
     for tt in tt_val:
-
+        print('val',tt)
+        
         for kisf in isf_val: 
-
+            
             clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
             clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
             clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
@@ -362,11 +364,11 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
 
     ## prepare input and target
 
-    y_train = train_input_df['melt_m_ice_per_y']
-    x_train = train_input_df.drop_vars(['melt_m_ice_per_y'])
+    #y_train = train_input_df['melt_m_ice_per_y']
+    #x_train = train_input_df.drop_vars(['melt_m_ice_per_y'])
 
-    y_val = val_input_df['melt_m_ice_per_y']
-    x_val = val_input_df.drop_vars(['melt_m_ice_per_y'])
+    #y_val = val_input_df['melt_m_ice_per_y']
+    #x_val = val_input_df.drop_vars(['melt_m_ice_per_y'])
 
     summary_ds_all = xr.open_dataset(inputpath_metrics + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     

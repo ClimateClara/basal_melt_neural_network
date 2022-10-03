@@ -72,16 +72,17 @@ if TS_opt == 'extrap':
 
 elif TS_opt == 'whole':
 
-    print(tblock_out)
+    #print(tblock_out)
     data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
 
     ## prepare input and target
-            
-    y_train_norm = data_train_merged_isf['melt_m_ice_per_y'].load()
-    x_train_norm = data_train_merged_isf.drop_vars(['melt_m_ice_per_y']).to_array().load()
-
-    y_val_norm = data_train_merged_isf['melt_m_ice_per_y'].load()
-    x_val_norm = data_train_merged_isf.drop_vars(['melt_m_ice_per_y']).to_array().load()
+    
+    print('test1')
+    y_train_norm = data_train_norm['melt_m_ice_per_y'].load()
+    x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
+    print('test2')
+    y_val_norm = data_train_norm['melt_m_ice_per_y'].load()
+    x_val_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
     
 else:
     print('Sorry, I dont know this option for TS input yet, you need to implement it...')
