@@ -261,7 +261,7 @@ def prepare_input_data_CV_onlymetrics(tblock_dim, isf_dim, tblock_out, isf_out, 
     return summary_ds_all
 
 
-def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method):
+def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method, ds_all=False, ds_idx=False):
 
     """
     Computes normalisation metrics and normalised predictors and target for cross-validation.
@@ -282,6 +282,11 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
         Path to folder where to find the preformatted csv files.
     norm_method: str
         Which norm method you want to use. Can be: 'std','interquart','minmax'
+    ds_all: xr.Dataset or False
+        Can be 'False' (then it sticks all csv together and it takes a lot of time) or a xarray Dataset with all variables
+    ds_idx: xr.Dataset or False
+        Can be 'False' (if ds_all is False) or a xarray Dataset with the isf and tblock corresponding to each index
+        
 
     Returns
     -------
@@ -315,53 +320,84 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
 
     ### prepare training dataset
 
-    train_input_df = None        
 
-    for tt in tblock_list:
-        print('train',tt)
+    
+    if ds_all is False:
         
-        for kisf in isf_list: 
+        
+        print('should NOT be here1')
+        train_input_df = None        
 
-            clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
-            clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
-            clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
+        for tt in tblock_list:
+            print('train',tt)
 
-            if train_input_df is None:
-                train_input_df = clean_ds_nrun_kisf.copy()
-            else:
-                new_index = clean_ds_nrun_kisf.index.values + train_input_df.index.max().values+1
-                clean_ds_nrun_kisf = clean_ds_nrun_kisf.assign_coords({'index': new_index})
-                train_input_df = xr.concat([train_input_df, clean_ds_nrun_kisf], dim='index') 
+            for kisf in isf_list: 
 
+                clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
+                clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
+                clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
+
+                if train_input_df is None:
+                    train_input_df = clean_ds_nrun_kisf.copy()
+                else:
+                    new_index = clean_ds_nrun_kisf.index.values + train_input_df.index.max().values+1
+                    clean_ds_nrun_kisf = clean_ds_nrun_kisf.assign_coords({'index': new_index})
+                    train_input_df = xr.concat([train_input_df, clean_ds_nrun_kisf], dim='index') 
+    
+    else:
+        print('should be here1')
+        
+        if (isf_out > 0) and (tblock_out == 0):
+            idx_of_int = ds_idx.index.where((ds_idx.Nisf == isf_out), drop=True)
+        elif (tblock_out > 0) and (isf_out == 0):  
+            idx_of_int = ds_idx.index.where((ds_idx.tblock == tblock_out), drop=True)
+        else:
+            print("I don't know how to handle leave ice shelves AND time blocks out, please teach me!")
+        
+        print('should be here11')
+        train_input_df = ds_all.drop_sel(index=idx_of_int)
+        
     ## prepare validation dataset
 
-    if (tblock_out > 0) and (isf_out == 0):  
-        tt_val = [tblock_out]
-        isf_val = isf_list
-    elif (isf_out > 0) and (tblock_out == 0):
-        isf_val = [isf_out]
-        tt_val = tblock_list
-    else:
-        print("I don't know how to handle leave ice shelves AND time blocks out, please teach me!")
 
-    val_input_df = None        
-
-    for tt in tt_val:
-        print('val',tt)
+    if ds_all is False:
         
-        for kisf in isf_val: 
-            
-            clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
-            clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
-            clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
+        if (tblock_out > 0) and (isf_out == 0):  
+            tt_val = [tblock_out]
+            isf_val = isf_list
+        elif (isf_out > 0) and (tblock_out == 0):
+            isf_val = [isf_out]
+            tt_val = tblock_list
+        else:
+            print("I don't know how to handle leave ice shelves AND time blocks out, please teach me!")
+    
+        
+        print('should NOT be here2')
+        val_input_df = None        
 
-            if val_input_df is None:
-                val_input_df = clean_ds_nrun_kisf.copy()
-            else:
-                new_index = clean_ds_nrun_kisf.index.values + val_input_df.index.max().values+1
-                clean_ds_nrun_kisf = clean_ds_nrun_kisf.assign_coords({'index': new_index})
-                val_input_df = xr.concat([val_input_df, clean_ds_nrun_kisf], dim='index') 
+        for tt in tt_val:
+            print('val',tt)
 
+            for kisf in isf_val: 
+
+                clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
+                clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
+                clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
+
+                if val_input_df is None:
+                    val_input_df = clean_ds_nrun_kisf.copy()
+                else:
+                    new_index = clean_ds_nrun_kisf.index.values + val_input_df.index.max().values+1
+                    clean_ds_nrun_kisf = clean_ds_nrun_kisf.assign_coords({'index': new_index})
+                    val_input_df = xr.concat([val_input_df, clean_ds_nrun_kisf], dim='index') 
+    
+    else:
+        
+        print('should be here2')
+        val_input_df = ds_all.sel(index=idx_of_int)
+        
+    
+    print('in here')
     ## prepare input and target
 
     #y_train = train_input_df['melt_m_ice_per_y']
@@ -369,13 +405,17 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
 
     #y_val = val_input_df['melt_m_ice_per_y']
     #x_val = val_input_df.drop_vars(['melt_m_ice_per_y'])
-
+    
     summary_ds_all = xr.open_dataset(inputpath_metrics + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     
+    print('in here1')
     var_mean = summary_ds_all.sel(metric='mean_vars', norm_method=norm_method)
+    print('in here2')
     var_range = summary_ds_all.sel(metric='range_vars', norm_method=norm_method)
-
-    var_train_norm = (train_input_df - var_mean)/var_range
-    var_val_norm = (val_input_df - var_mean)/var_range
+    
+    print('in here3')
+    var_train_norm = (train_input_df.chunk({'index': 20000}) - var_mean)/var_range
+    print('in here4')
+    var_val_norm = (val_input_df.chunk({'index': 20000}) - var_mean)/var_range
     
     return var_train_norm, var_val_norm

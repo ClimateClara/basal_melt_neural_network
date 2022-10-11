@@ -73,7 +73,10 @@ if TS_opt == 'extrap':
 elif TS_opt == 'whole':
 
     #print(tblock_out)
-    data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method)
+    inputpath_prof = inputpath_data+'WHOLE_PROF_CHUNKS/'
+    ds_all = xr.open_dataset(inputpath_prof + 'dataframe_allisf_tblocks1to13.nc')
+    ds_idx = xr.open_dataset(inputpath_prof + 'indexing_allisf_tblocks1to13.nc')
+    data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method, ds_all=ds_all, ds_idx=ds_idx)
 
     ## prepare input and target
     
