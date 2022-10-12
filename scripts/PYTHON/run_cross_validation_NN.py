@@ -58,39 +58,45 @@ elif TS_opt == 'whole':
 elif TS_opt == 'thermocline':
     inputpath_CVinput = inputpath_data+'THERMOCLINE_CHUNKS_CV/'
 
+
 if TS_opt == 'extrap':
+    
     data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
+
     
     ## prepare input and target
             
     y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
     x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
 
-    y_val_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-    x_val_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    y_val_norm = data_val_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
+    x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
 
 elif TS_opt == 'whole':
 
-    #print(tblock_out)
-    inputpath_prof = inputpath_data+'WHOLE_PROF_CHUNKS/'
-    ds_all = xr.open_dataset(inputpath_prof + 'dataframe_allisf_tblocks1to13.nc')
-    ds_idx = xr.open_dataset(inputpath_prof + 'indexing_allisf_tblocks1to13.nc')
-    data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method, ds_all=ds_all, ds_idx=ds_idx)
-
-    ## prepare input and target
+    ##print(tblock_out)
+    #inputpath_prof = inputpath_data+'WHOLE_PROF_CHUNKS/'
+    #ds_all = xr.open_dataset(inputpath_prof + 'dataframe_allisf_tblocks1to13.nc')
+    #ds_idx = xr.open_dataset(inputpath_prof + 'indexing_allisf_tblocks1to13.nc')
+    #data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method, ds_all=ds_all, ds_idx=ds_idx)
     
-    print('test1')
+    print('read in data1')
+    data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    print('read in data2')
+    data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
+    
+    ## prepare input and target
+    print('prepare data1')
     y_train_norm = data_train_norm['melt_m_ice_per_y'].load()
     x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
-    print('test2')
-    y_val_norm = data_train_norm['melt_m_ice_per_y'].load()
-    x_val_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
+    
+    print('prepare data2')
+    y_val_norm = data_val_norm['melt_m_ice_per_y'].load()
+    x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
     
 else:
     print('Sorry, I dont know this option for TS input yet, you need to implement it...')
-
-
 
 
 ######### TRAIN THE MODEL
@@ -117,6 +123,9 @@ early_stop = tf.keras.callbacks.EarlyStopping(
 )
 
 time_start = time.time()
+time_start0 = datetime.datetime.now()
+print(time_start0)
+
 history = model.fit(x_train_norm.T.values,
                     y_train_norm.values,
                     epochs          = epoch_nb,
@@ -126,6 +135,10 @@ history = model.fit(x_train_norm.T.values,
                    callbacks=[reduce_lr, early_stop])
 time_end = time.time()
 timelength = time_end - time_start
+
+time_end0 = datetime.datetime.now()
+print(time_end0)
+
 #with open(new_path_doc+'info_'+timetag+'.log','a') as file:
 #    file.write('\n Reduce_lr: True')
 #    file.write('\n Early_stop: True')

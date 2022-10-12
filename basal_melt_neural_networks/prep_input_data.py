@@ -406,7 +406,7 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     #y_val = val_input_df['melt_m_ice_per_y']
     #x_val = val_input_df.drop_vars(['melt_m_ice_per_y'])
     
-    summary_ds_all = xr.open_dataset(inputpath_metrics + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    summary_ds_all = xr.open_mfdataset(inputpath_metrics + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     
     print('in here1')
     var_mean = summary_ds_all.sel(metric='mean_vars', norm_method=norm_method)
@@ -414,8 +414,8 @@ def prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, i
     var_range = summary_ds_all.sel(metric='range_vars', norm_method=norm_method)
     
     print('in here3')
-    var_train_norm = (train_input_df.chunk({'index': 20000}) - var_mean)/var_range
+    var_train_norm = (train_input_df - var_mean)/var_range
     print('in here4')
-    var_val_norm = (val_input_df.chunk({'index': 20000}) - var_mean)/var_range
+    var_val_norm = (val_input_df - var_mean)/var_range
     
     return var_train_norm, var_val_norm
