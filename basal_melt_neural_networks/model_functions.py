@@ -4,7 +4,7 @@ These are the functions to setup and use the NN models
 
 from tensorflow import keras
 
-def get_model(size,shape,activ_fct): #'mini', 'small', 'medium', 'large', 'extra_large'
+def get_model(size,shape,activ_fct,output_shape): #'mini', 'small', 'medium', 'large', 'extra_large'
     
     model = keras.models.Sequential()
     model.add(keras.layers.Input(shape, name="InputLayer"))
@@ -40,7 +40,7 @@ def get_model(size,shape,activ_fct): #'mini', 'small', 'medium', 'large', 'extra
         model.add(keras.layers.Dense(256, activation= activ_fct, name='Dense_n5'))
         model.add(keras.layers.Dense(256, activation= activ_fct, name='Dense_n6'))
     
-    model.add(keras.layers.Dense(1, name='Output'))
+    model.add(keras.layers.Dense(output_shape, name='Output'))
 
     model.compile(optimizer = 'adam',
                   loss      = 'mse',
