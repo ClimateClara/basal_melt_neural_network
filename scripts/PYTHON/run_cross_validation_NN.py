@@ -68,10 +68,10 @@ if TS_opt == 'extrap':
     ## prepare input and target
             
     y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-    x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
 
     y_val_norm = data_val_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-    x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
 
 elif TS_opt == 'whole':
 
@@ -106,7 +106,7 @@ activ_fct = 'relu' #LeakyReLU
 epoch_nb = 100
 batch_siz = 512
 
-model = modf.get_model(mod_size, input_size, activ_fct)
+model = modf.get_model(mod_size, input_size, activ_fct,1)
 
 
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,

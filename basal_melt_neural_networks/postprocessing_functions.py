@@ -2,6 +2,9 @@ import xarray as xr
 import numpy as np
 import pandas as pd
 import basal_melt_neural_networks.data_formatting as dfmt
+from tqdm.notebook import tqdm
+from tensorflow import keras
+from basal_melt_neural_networks.constants import *
 
 
 def identify_nemo_run_from_tblock(tblock):
@@ -62,3 +65,135 @@ def read_input_evalmetrics_NN(nemo_run):
                             file_isf_conc])
     
     return file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask
+
+def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, drop_vars=['melt_m_ice_per_y']):
+    """
+    Compute 2D melt based on a given NN model
+    
+    """
+
+    val_norm = normalise_vars(df_nrun,
+                                norm_metrics.loc['mean_vars'],
+                                norm_metrics.loc['range_vars'])
+
+    x_val_norm = val_norm.drop(drop_vars, axis=1)
+    y_val_norm = val_norm['melt_m_ice_per_y']
+
+    y_out_norm = model.predict(x_val_norm.values)
+
+    y_out_norm_xr = xr.DataArray(data=y_out_norm.squeeze()).rename({'dim_0': 'index'})
+    y_out_norm_xr = y_out_norm_xr.assign_coords({'index': x_val_norm.index})
+
+    # denormalise the output
+    y_out = denormalise_vars(y_out_norm_xr, 
+                             norm_metrics['melt_m_ice_per_y'].loc['mean_vars'],
+                             norm_metrics['melt_m_ice_per_y'].loc['range_vars'])
+
+    y_out_pd_s = pd.Series(y_out.values,index=df_nrun.index,name='predicted_melt') 
+    y_target_pd_s = pd.Series(df_nrun['melt_m_ice_per_y'].values,index=df_nrun.index,name='reference_melt') 
+
+    # put some order in the file
+    y_out_xr = y_out_pd_s.to_xarray()
+    y_target_xr = y_target_pd_s.to_xarray()
+    y_to_compare = xr.merge([y_out_xr.T, y_target_xr.T]).sortby('y')
+
+    y_whole_grid = y_to_compare.reindex_like(file_isf['ISF_mask'])
+    return y_whole_grid
+
+    
+def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars=['melt_m_ice_per_y']):
+    
+    """
+    Compute 1D metrics based on a given NN model
+    
+    """
+    
+    melt2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, drop_vars)
+
+    if box_charac_2D and box_charac_1D:
+        box_loc_config2 = box_charac_2D['box_location'].sel(box_nb_tot=box_charac_1D['nD_config'].sel(config=2))
+        box1 = box_loc_config2.where(box_loc_config2==1).isel(Nisf=0).drop('Nisf')
+
+    geometry_isf_2D = dfmt.choose_isf(geometry_info_2D,isf_stack_mask, kisf)
+    melt_rate_2D_isf_m_per_y = dfmt.choose_isf(melt2D,isf_stack_mask, kisf)
+
+    melt_rate_1D_isf_Gt_per_y = (melt_rate_2D_isf_m_per_y * geometry_isf_2D['grid_cell_area_weighted']).sum(dim=['mask_coord']) * rho_i / 10**12
+
+    box_loc_config_stacked = dfmt.choose_isf(box1, isf_stack_mask, kisf)
+    param_melt_2D_box1_isf = melt_rate_2D_isf_m_per_y.where(np.isfinite(box_loc_config_stacked))
+
+    melt_rate_1D_isf_myr_box1_mean = dfmt.weighted_mean(param_melt_2D_box1_isf,['mask_coord'], geometry_isf_2D['isfdraft_conc'])     
+
+    out_1D = xr.concat([melt_rate_1D_isf_Gt_per_y, melt_rate_1D_isf_myr_box1_mean], dim='metrics').assign_coords({'metrics': ['Gt','box1']})
+    return out_1D
+
+def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,drop_vars=['melt_m_ice_per_y'],verbose=True):
+
+    """
+    Compute 1D metrics based on a given NN model for a given cross-validation axis
+    
+    """
+    
+    if ((isf_out > 0) and (tblock_out == 0)):
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/CV_ISF/'
+        tblock_list = tblock_dim
+    elif ((tblock_out > 0) and (isf_out == 0)):     
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/CV_TBLOCK/'
+        isf_list = isf_dim
+    else:
+        raise ValueError("HELP, I DON'T KNOW HOW TO HANDLE AN ISF AND A TBLOCK OUT...")
+
+    res_1D_list = []
+    
+    # CV over shelves
+    if ((isf_out > 0) and (tblock_out == 0)):
+        
+        if verbose:
+            loop_list = tqdm(tblock_list)
+            print("Ok, we're doing cross-validation over ice shelves")
+        else:
+            loop_list = tblock_list
+            
+        for tblock in loop_list:
+            
+            nemo_run = identify_nemo_run_from_tblock(tblock)
+            file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+            norm_metrics_file = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_1D = evalmetrics_1D_NN(isf_out, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars)
+            res_1D_list.append(res_1D)
+        
+        res_1D_all = xr.concat(res_1D_list, dim='time')
+    
+    # CV OVER TIME
+    elif ((tblock_out > 0) and (isf_out == 0)):
+        
+        nemo_run = identify_nemo_run_from_tblock(tblock_out)
+        file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+
+        if verbose:
+            loop_list = tqdm(isf_list)
+            print("Ok, we're doing cross-validation over time")
+        else:
+            loop_list = isf_list
+        
+        for kisf in loop_list: 
+            
+            norm_metrics_file = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_1D = evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars)    
+            res_1D_list.append(res_1D)
+        
+        res_1D_all = xr.concat(res_1D_list, dim='Nisf')
+            
+    return res_1D_all

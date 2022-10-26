@@ -2,8 +2,8 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=extra_large  #'mini', 'small', 'medium', 'large', 'extra_large'
-TS_opt=whole # extrap, whole, thermocline
+mod_size=medium  #'mini', 'small', 'medium', 'large', 'extra_large'
+TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 
 
@@ -18,8 +18,8 @@ isf_out=$ii
 #tblock_out=$tt
 tblock_out=00
 
-path_jobscripts=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_SCRIPTS
-path_outfiles=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_OUTFILES
+path_jobscripts=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_SCRIPTS/test_wo_isf_constants
+path_outfiles=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_OUTFILES/test_wo_isf_constants
 
 path_python=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/PYTHON
 path_jobid=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/JOB_STD_OUTPUT
