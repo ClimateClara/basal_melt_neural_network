@@ -28,12 +28,13 @@ tblock_out = int(sys.argv[2])
 isf_out = int(sys.argv[3])
 TS_opt = str(sys.argv[4]) # extrap, whole, thermocline
 norm_method = str(sys.argv[5]) # std, interquart, minmax
+exp_name = str(sys.argv[6])
 
 ######### READ IN DATA
 
 inputpath_data = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/'
-outputpath_nn_models = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'
-outputpath_doc = '/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/custom_doc/'
+outputpath_nn_models = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/experiments/'
+outputpath_doc = '/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/custom_doc/experiments/'
 
 tblock_dim = range(1,14)
 isf_dim = [10,11,12,13,18,22,23,24,25,30,31,33,38,39,40,42,43,44,45,47,48,51,52,53,54,55,58,61,65,66,69,70,71,73,75]
@@ -68,10 +69,12 @@ if TS_opt == 'extrap':
     ## prepare input and target
             
     y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-    x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    #x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
+    x_train_norm = data_train_norm[['corrected_isfdraft','theta_in','salinity_in']].sel(norm_method=norm_method).to_array().load()
 
     y_val_norm = data_val_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
-    x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).sel(norm_method=norm_method).to_array().load()
+    #x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
+    x_val_norm = data_val_norm[['corrected_isfdraft','theta_in','salinity_in']].sel(norm_method=norm_method).to_array().load()
 
 elif TS_opt == 'whole':
 
@@ -143,11 +146,11 @@ print(time_end0)
 #    file.write('\n Reduce_lr: True')
 #    file.write('\n Early_stop: True')
 #    file.write('\n Training time (in s): '+str(timelength))
-model.save(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+model.save(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
 
 # convert the history.history dict to a pandas DataFrame:     
 hist_df = pd.DataFrame(history.history) 
 
-hist_csv_file = path_model + 'history_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.csv'
+hist_csv_file = path_model + 'history_'+mod_size+'_'+exp_name+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.csv'
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
