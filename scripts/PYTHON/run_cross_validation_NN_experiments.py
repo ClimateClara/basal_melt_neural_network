@@ -30,6 +30,10 @@ TS_opt = str(sys.argv[4]) # extrap, whole, thermocline
 norm_method = str(sys.argv[5]) # std, interquart, minmax
 exp_name = str(sys.argv[6])
 
+# INPUT
+# onlyTSdraft: 'corrected_isfdraft','theta_in','salinity_in'
+# TSdraftbotandiceddandwcd: 'corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot'
+
 ######### READ IN DATA
 
 inputpath_data = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/'
@@ -62,19 +66,23 @@ elif TS_opt == 'thermocline':
 
 if TS_opt == 'extrap':
     
-    data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
-    data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
-
+    data_train_orig_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    data_val_orig_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
+    data_train_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'train_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    data_val_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'val_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    
+    data_train_norm = xr.merge([data_train_orig_norm, data_train_addvar1_norm])
+    data_val_norm = xr.merge([data_train_orig_norm, data_val_addvar1_norm])
     
     ## prepare input and target
             
     y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
     #x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
-    x_train_norm = data_train_norm[['corrected_isfdraft','theta_in','salinity_in']].sel(norm_method=norm_method).to_array().load()
+    x_train_norm = data_train_norm[['corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot']].sel(norm_method=norm_method).to_array().load()
 
     y_val_norm = data_val_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
     #x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y','isf_area','entry_depth_max']).sel(norm_method=norm_method).to_array().load()
-    x_val_norm = data_val_norm[['corrected_isfdraft','theta_in','salinity_in']].sel(norm_method=norm_method).to_array().load()
+    x_val_norm = data_val_norm[['corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot']].sel(norm_method=norm_method).to_array().load()
 
 elif TS_opt == 'whole':
 
