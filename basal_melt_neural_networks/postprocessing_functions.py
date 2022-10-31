@@ -127,7 +127,7 @@ def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_inf
     out_1D = xr.concat([melt_rate_1D_isf_Gt_per_y, melt_rate_1D_isf_myr_box1_mean], dim='metrics').assign_coords({'metrics': ['Gt','box1']})
     return out_1D
 
-def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,drop_vars=['melt_m_ice_per_y'],verbose=True):
+def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,drop_vars=['melt_m_ice_per_y'],verbose=True):
 
     """
     Compute 1D metrics based on a given NN model for a given cross-validation axis
@@ -135,10 +135,10 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
     """
     
     if ((isf_out > 0) and (tblock_out == 0)):
-        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/CV_ISF/'
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'+path_model_end+'CV_ISF/'
         tblock_list = tblock_dim
     elif ((tblock_out > 0) and (isf_out == 0)):     
-        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/CV_TBLOCK/'
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'+path_model_end+'CV_TBLOCK/'
         isf_list = isf_dim
     else:
         raise ValueError("HELP, I DON'T KNOW HOW TO HANDLE AN ISF AND A TBLOCK OUT...")
