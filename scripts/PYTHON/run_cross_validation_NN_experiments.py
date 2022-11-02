@@ -33,6 +33,8 @@ exp_name = str(sys.argv[6])
 # INPUT
 # onlyTSdraft: 'corrected_isfdraft','theta_in','salinity_in'
 # TSdraftbotandiceddandwcd: 'corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot'
+# TSdraftbotandiceddandwcdreldGL: 'corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot','rel_dGL'
+# onlyTSdraftandslope : 'corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat'
 
 ######### READ IN DATA
 
@@ -71,10 +73,13 @@ if TS_opt == 'extrap':
     data_train_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'train_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     data_val_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'val_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     
-    data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']], 
-                                data_train_addvar1_norm[['water_col_depth','theta_bot','salinity_bot']]])
-    data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']], 
-                                data_val_addvar1_norm[['water_col_depth','theta_bot','salinity_bot']]])
+    #data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']], 
+    #                            data_train_addvar1_norm[['water_col_depth','theta_bot','salinity_bot','rel_dGL']]])
+    data_train_norm = data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']]
+    #data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']], 
+    #                            data_val_addvar1_norm[['water_col_depth','theta_bot','salinity_bot','rel_dGL']]])
+    data_val_norm = data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']]
+
     
     ## prepare input and target
     y_train_norm = data_train_norm['melt_m_ice_per_y'].sel(norm_method=norm_method).load()
