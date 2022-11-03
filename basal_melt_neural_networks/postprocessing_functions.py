@@ -66,7 +66,7 @@ def read_input_evalmetrics_NN(nemo_run):
     
     return file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask
 
-def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, drop_vars=['melt_m_ice_per_y']):
+def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars=[]):
     """
     Compute 2D melt based on a given NN model
     
@@ -76,7 +76,7 @@ def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, dro
                                 norm_metrics.loc['mean_vars'],
                                 norm_metrics.loc['range_vars'])
 
-    x_val_norm = val_norm.drop(drop_vars, axis=1)
+    x_val_norm = val_norm[input_vars]
     y_val_norm = val_norm['melt_m_ice_per_y']
 
     y_out_norm = model.predict(x_val_norm.values)
@@ -101,14 +101,14 @@ def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, dro
     return y_whole_grid
 
     
-def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars=['melt_m_ice_per_y']):
+def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, input_vars=[]):
     
     """
     Compute 1D metrics based on a given NN model
     
     """
     
-    melt2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, drop_vars)
+    melt2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars)
 
     if box_charac_2D and box_charac_1D:
         box_loc_config2 = box_charac_2D['box_location'].sel(box_nb_tot=box_charac_1D['nD_config'].sel(config=2))
@@ -127,7 +127,7 @@ def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_inf
     out_1D = xr.concat([melt_rate_1D_isf_Gt_per_y, melt_rate_1D_isf_myr_box1_mean], dim='metrics').assign_coords({'metrics': ['Gt','box1']})
     return out_1D
 
-def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,drop_vars=['melt_m_ice_per_y'],verbose=True):
+def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,input_vars=[],verbose=True):
 
     """
     Compute 1D metrics based on a given NN model for a given cross-validation axis
@@ -172,7 +172,7 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
 
             model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
             
-            res_1D = evalmetrics_1D_NN(isf_out, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars)
+            res_1D = evalmetrics_1D_NN(isf_out, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, input_vars)
             res_1D_list.append(res_1D)
         
         res_1D_all = xr.concat(res_1D_list, dim='time')
@@ -204,7 +204,7 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
 
             model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
             
-            res_1D = evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, drop_vars)    
+            res_1D = evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, input_vars)    
             res_1D_list.append(res_1D)
         
         res_1D_all = xr.concat(res_1D_list, dim='Nisf')
