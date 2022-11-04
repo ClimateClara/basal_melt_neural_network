@@ -210,3 +210,90 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
         res_1D_all = xr.concat(res_1D_list, dim='Nisf')
             
     return res_1D_all
+
+def compute_crossval_metric_2D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,input_vars=[],verbose=True):
+
+    """
+    Compute 2D metrics based on a given NN model for a given cross-validation axis
+    
+    """
+    
+    if ((isf_out > 0) and (tblock_out == 0)):
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'+path_model_end+'CV_ISF/'
+        tblock_list = tblock_dim
+    elif ((tblock_out > 0) and (isf_out == 0)):     
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/'+path_model_end+'CV_TBLOCK/'
+        isf_list = isf_dim
+    else:
+        raise ValueError("HELP, I DON'T KNOW HOW TO HANDLE AN ISF AND A TBLOCK OUT...")
+
+    res_2D_list = []
+    
+    # CV over shelves
+    if ((isf_out > 0) and (tblock_out == 0)):
+        
+        if verbose:
+            loop_list = tqdm(tblock_list)
+            print("Ok, we're doing cross-validation over ice shelves")
+        else:
+            loop_list = tblock_list
+            
+        for tblock in loop_list:
+            
+            nemo_run = identify_nemo_run_from_tblock(tblock)
+            file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+            
+            norm_metrics_file_orig = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics_file_addvar1 = xr.open_dataset(inputpath_CVinput + 'metrics_norm_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics_file_addvar1 = norm_metrics_file_addvar1.drop('salinity_in')
+            norm_metrics_file = xr.merge([norm_metrics_file_orig,norm_metrics_file_addvar1])
+            norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
+            df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
+
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars)
+            res_2D_list.append(res_2D)
+            
+        res_2D_all = xr.concat(res_2D_list, dim='time')
+    
+    # CV OVER TIME
+    elif ((tblock_out > 0) and (isf_out == 0)):
+        
+        nemo_run = identify_nemo_run_from_tblock(tblock_out)
+        file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+
+        if verbose:
+            loop_list = tqdm(isf_list)
+            print("Ok, we're doing cross-validation over time")
+        else:
+            loop_list = isf_list
+        
+        res_2D_all = None
+        for kisf in loop_list: 
+            
+            norm_metrics_file_orig = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics_file_addvar1 = xr.open_dataset(inputpath_CVinput + 'metrics_norm_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+            norm_metrics_file_addvar1 = norm_metrics_file_addvar1.drop('salinity_in')
+            norm_metrics_file = xr.merge([norm_metrics_file_orig,norm_metrics_file_addvar1])
+            norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
+            df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
+
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars)
+            
+            if res_2D_all is None:
+                res_2D_all = res_2D
+            else:
+                res_2D_all = res_2D_all.combine_first(res_2D)
+            
+    return res_2D_all

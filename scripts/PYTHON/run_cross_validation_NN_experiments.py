@@ -33,7 +33,7 @@ exp_name = str(sys.argv[6])
 # INPUT
 # onlyTSdraft: 'corrected_isfdraft','theta_in','salinity_in'
 # TSdraftbotandiceddandwcd: 'corrected_isfdraft','theta_in','salinity_in','water_col_depth','theta_bot','salinity_bot'
-# TSdraftbotandiceddandwcdreldGL: 'corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot','rel_dGL'
+# TSdraftbotandiceddandwcdreldGL: 'corrected_isfdraft','theta_in','salinity_in','water_col_depth','theta_bot','salinity_bot','rel_dGL'
 # onlyTSdraftandslope : 'corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat'
 # onlyTSdraft2 : same as onlyTSdraft, just to check that everything is working well
 
