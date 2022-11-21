@@ -76,12 +76,12 @@ if TS_opt == 'extrap':
     data_train_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'train_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     data_val_addvar1_norm = xr.open_dataset(inputpath_CVinput + 'val_addvar1_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
     
-    data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
-                                data_train_addvar1_norm[['rel_dGL']]])
-    #data_train_norm = data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']]
-    data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
-                                data_val_addvar1_norm[['rel_dGL']]])
-    #data_val_norm = data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']]
+    #data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
+    #                            data_train_addvar1_norm[['rel_dGL']]])
+    data_train_norm = data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']]
+    #data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
+    #                            data_val_addvar1_norm[['rel_dGL']]])
+    data_val_norm = data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']]
 
     
     ## prepare input and target
