@@ -2,8 +2,8 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=extra_large  #'mini', 'small', 'medium', 'large', 'extra_large'
-TS_opt=extrap # extrap, whole, thermocline
+mod_size=medium  #'mini', 'small', 'medium', 'large', 'extra_large'
+TS_opt=whole # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=onlyTSdraftandslope
 
@@ -14,7 +14,7 @@ do
 isf_out=$ii
 #isf_out=00
 
-#for tt in {01..13}
+#for tt in {03..13}
 #do
 #tblock_out=$tt
 tblock_out=00
@@ -35,7 +35,7 @@ EOF
 
 chmod +x $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.sh
 
-oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.e%jobid% -l nodes=1/core=6,walltime=10:00:00 --project mais -p "network_address='luke60'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.sh
+oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.e%jobid% -l nodes=1/core=6,walltime=10:00:00 --project mais -p "network_address='luke62'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_noisf${isf_out}_notblock${tblock_out}_${exp_name}.sh
 
 # to remove if no CV!!!
 done

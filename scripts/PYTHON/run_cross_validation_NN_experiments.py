@@ -95,25 +95,42 @@ if TS_opt == 'extrap':
     #print('here6')
     #x_val_norm = data_val_norm[['corrected_isfdraft','water_col_depth','theta_in','salinity_in','theta_bot','salinity_bot']].sel(norm_method=norm_method).to_array().load()
 
-elif TS_opt == 'whole':
+if TS_opt == 'whole':
 
+    
     ##print(tblock_out)
     #inputpath_prof = inputpath_data+'WHOLE_PROF_CHUNKS/'
     #ds_all = xr.open_dataset(inputpath_prof + 'dataframe_allisf_tblocks1to13.nc')
     #ds_idx = xr.open_dataset(inputpath_prof + 'indexing_allisf_tblocks1to13.nc')
     #data_train_norm, data_val_norm = indat.prepare_normed_input_data_CV_metricsgiven(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inputpath_data, norm_method, ds_all=ds_all, ds_idx=ds_idx)
     
-    print('read in data1')
-    data_train_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
-    print('read in data2')
-    data_val_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
+    #print('read in data1')
+    data_train_orig_norm = xr.open_dataset(inputpath_CVinput + 'train_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc')
+    #print('read in data2')
+    data_val_orig_norm = xr.open_dataset(inputpath_CVinput + 'val_data_CV_norm'+norm_method+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'.nc') 
+
+    T_list = []
+    S_list = []
+    for kk in data_val_orig_norm.keys():
+        #print(kk)
+        if kk[0:2] == 'T_':
+            T_list.append(kk)
+        elif kk[0:2] == 'S_':
+            S_list.append(kk)
+    
+    var_list = ['corrected_isfdraft','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']
+    var_list[-1:0] = T_list 
+    var_list[-1:0] = S_list 
+    
+    data_train_norm = data_train_orig_norm[var_list]
+    data_val_norm = data_val_orig_norm[var_list]
     
     ## prepare input and target
-    print('prepare data1')
+    #print('prepare data1')
     y_train_norm = data_train_norm['melt_m_ice_per_y'].load()
     x_train_norm = data_train_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
     
-    print('prepare data2')
+    #print('prepare data2')
     y_val_norm = data_val_norm['melt_m_ice_per_y'].load()
     x_val_norm = data_val_norm.drop_vars(['melt_m_ice_per_y']).to_array().load()
     
