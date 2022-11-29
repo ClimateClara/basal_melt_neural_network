@@ -25,7 +25,7 @@ path5=$homepath/DATA/NN_PARAM/raw/
 ###### VARIABLES
 
 echo 'cp > create gridded file'
-cp $path5/grid_eORCA025_CDO_Fabien.nc $path2/variables_of_interest_allyy.nc
+cp $path5/grid_eORCA025_CDO_Fabien.nc $path2/variables_of_interest_allyy.nc # I would need to check if I can cut the grid
 
 for var in {thetao,so}
 do
@@ -48,7 +48,7 @@ ncks -A -C -v $var $path2/$var.nc $path2/variables_of_interest_allyy.nc
 echo 'ncatted > put coords to lon lat' $var
 ncatted -a coordinates,$var,m,c,"lon lat" $path2/variables_of_interest_allyy.nc
 \rm $path2/$var.nc
-done
+
 
 ###### MASK
 
@@ -65,4 +65,13 @@ echo 'ncks > put variable in file'
 ncks -A -C -v $var $path2/$var.nc $path2/mask_variables_of_interest_allyy.nc
 echo 'ncatted > put coords to lon lat'
 ncatted -a coordinates,$var,m,c,"lon lat" $path2/mask_variables_of_interest_allyy.nc
+done
 
+#### PREPARE LAND SEA MASK
+
+cdo sub Bathymetry_isf.nc isf_draft.nc diff_bathy_draft.nc # difference bathymetry - isf draft
+cdo gtc,0 isf_draft.nc isfdraft_gtc0.nc # identify where there is ice => 1
+cdo eqc,0 Bathymetry_isf.nc bathy_0.nc # identify where there is ground without ice => 1
+cdo add bathy_0.nc isfdraft_gtc0.nc ice_1.nc # where there is ice and ground without ice => 1
+cdo eqc,0 diff_bathy_draft.nc diff_0.nc # where there is ice and ground without ice => 1
+cdo add ice_1.nc diff_0.nc lsmask_012.nc # land sea mask with 012
