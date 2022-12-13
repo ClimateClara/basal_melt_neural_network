@@ -67,6 +67,24 @@ echo 'ncatted > put coords to lon lat' $var
 ncatted -a coordinates,$var,m,c,"lon lat" $path2/2D_variables_of_interest_allyy.nc
 \rm $path2/$var.nc
 
+
+echo 'cp > create gridded file'
+cp $path5/grid_eORCA025_CDO_Fabien_southofaround50.nc $path2/3D_depth_coord.nc 
+
+var=gdept_0
+echo $var
+echo 'ncks > extract variable from mesh_mask' $var
+ncks -O -C -v $var $path1/nemo_"$nemo_run"c_18801201_mesh_mask.nc $path2/$var.nc # add c if bi646, o if bf663
+echo 'cut region of interest'
+ncks -d y,0,500 $path2/$var.nc $path2/"$var"_cut.nc
+echo 'ncks > put variable in file' $var
+ncks -A -C -v $var $path2/"$var"_cut.nc $path2/3D_depth_coord.nc 
+echo 'ncatted > put coords to lon lat' $var
+ncatted -a coordinates,$var,m,c,"lon lat" $path2/3D_depth_coord.nc 
+\rm $path2/$var.nc
+\rm $path2/"$var"_cut.nc
+
+
 ###### MASK
 
 echo 'cp > create gridded file'
@@ -88,7 +106,8 @@ cdo setgrid,$path2/2D_variables_of_interest_allyy.nc $path2/mask_variables_of_in
 cdo sellonlatbox,0,360,-90,-50 $path2/mask_variables_of_interest_allyy_setgrid.nc $path2/mask_variables_of_interest_allyy_Ant.nc
 cdo sellonlatbox,0,360,-90,-50 $path2/3D_variables_of_interest_allyy.nc $path2/3D_variables_of_interest_allyy_Ant.nc
 cdo sellonlatbox,0,360,-90,-50 $path2/2D_variables_of_interest_allyy.nc $path2/2D_variables_of_interest_allyy_Ant.nc
-
+cdo setgrid,$path2/2D_variables_of_interest_allyy.nc $path2/3D_depth_coord.nc $path2/3D_depth_coord_setgrid.nc
+cdo sellonlatbox,0,360,-90,-50 $path2/3D_depth_coord_setgrid.nc $path2/3D_depth_coord_Ant.nc 
 
 
 #### PREPARE LAND SEA MASK
