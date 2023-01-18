@@ -118,3 +118,13 @@ cdo eqc,0 -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc 
 cdo add $path2/bathy_0.nc $path2/isfdraft_gtc0.nc $path2/ice_1.nc # where there is ice and ground without ice => 1
 cdo eqc,0 $path2/diff_bathy_draft.nc $path2/diff_0.nc # where there is ice and ground without ice => 1
 cdo add $path2/ice_1.nc $path2/diff_0.nc $path2/lsmask_012.nc # land sea mask with 012
+
+#### SET LAND TO NAN AND NOT 0 IN TEMPERATURE AND SALINITY
+
+cdo gtc,0 -selvar,so $path2/3D_variables_of_interest_allyy_Ant.nc $path2/mask_for_ocean_through_salinity.nc
+cdo ifthen -selvar,so $path2/mask_for_ocean_through_salinity.nc -selvar,so $path2/3D_variables_of_interest_allyy_Ant.nc $path2/salinity_allyy_Ant_withNaN.nc
+cdo ifthen -selvar,so $path2/mask_for_ocean_through_salinity.nc -selvar,thetao $path2/3D_variables_of_interest_allyy_Ant.nc $path2/theta_allyy_Ant_withNaN.nc
+cdo merge -selvar,thetao $path2/theta_allyy_Ant_withNaN.nc -selvar,so $path2/salinity_allyy_Ant_withNaN.nc $path2/TandS_allyy_Ant_withNaN.nc
+
+cdo settaxis,1970-01-01,12:00:00,1year TandS_allyy_Ant_withNaN.nc TandS_allyy_Ant_withNaN_timeaxis.nc
+cdo splityear TandS_allyy_Ant_withNaN_timeaxis.nc TandS_allyy_Ant_withNaN_
