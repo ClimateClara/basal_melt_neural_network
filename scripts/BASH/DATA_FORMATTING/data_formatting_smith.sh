@@ -116,7 +116,7 @@ cdo sub -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc -s
 cdo gtc,0 -selvar,isf_draft $path2/mask_variables_of_interest_allyy_Ant.nc $path2/isfdraft_gtc0.nc # identify where there is ice => 1
 cdo eqc,0 -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc $path2/bathy_0.nc # identify where there is ground without ice => 1
 cdo add $path2/bathy_0.nc $path2/isfdraft_gtc0.nc $path2/ice_1.nc # where there is ice and ground without ice => 1
-cdo eqc,0 $path2/diff_bathy_draft.nc $path2/diff_0.nc # where there is ice and ground without ice => 1
+cdo eqc,0 $path2/diff_bathy_draft.nc $path2/diff_0.nc # where there is no ocean or floating ice shelf => 1
 cdo add $path2/ice_1.nc $path2/diff_0.nc $path2/lsmask_012.nc # land sea mask with 012
 
 #### SET LAND TO NAN AND NOT 0 IN TEMPERATURE AND SALINITY
