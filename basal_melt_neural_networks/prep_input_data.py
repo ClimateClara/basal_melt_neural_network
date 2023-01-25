@@ -124,6 +124,9 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
     elif (isf_out > 0) and (tblock_out == 0):
         isf_val = [isf_out]
         tt_val = tblock_list
+    elif (isf_out == 0) and (tblock_out == 0):
+        isf_val = isf_list
+        tt_val = tblock_list
     else:
         print("I don't know how to handle leave ice shelves AND time blocks out, please teach me!")
 
