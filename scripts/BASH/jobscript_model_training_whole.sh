@@ -2,10 +2,10 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=large  #'mini', 'small', 'medium', 'large', 'extra_large'
+mod_size=medium  #'mini', 'small', 'medium', 'large', 'extra_large'
 TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
-exp_name=allbutconstants
+exp_name=onlyTSdraftandslope
 
 
 path_jobscripts=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_SCRIPTS/experiments

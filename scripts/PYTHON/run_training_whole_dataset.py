@@ -28,6 +28,26 @@ TS_opt = str(sys.argv[2]) # extrap, whole, thermocline
 norm_method = str(sys.argv[3]) # std, interquart, minmax
 exp_name = str(sys.argv[4])
 
+if exp_name == 'onlyTSdraft':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']
+elif exp_name == 'TSdraftbotandiceddandwcd':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','water_col_depth','theta_bot','salinity_bot','melt_m_ice_per_y']
+elif exp_name == 'TSdraftbotandiceddandwcdreldGL':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','water_col_depth','theta_bot','salinity_bot','rel_dGL',
+                'melt_m_ice_per_y']
+elif exp_name == 'onlyTSdraftandslope':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']
+elif exp_name == 'onlyTSdraft2':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']
+elif exp_name == 'TSTfdGLdIFwcd':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','dGL','dIF','slope_ice_lon','slope_ice_lat','water_col_depth',
+                'melt_m_ice_per_y']
+elif exp_name == 'TSdraftslopereldGL':
+    var_list = ['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','rel_dGL','melt_m_ice_per_y']
+elif exp_name == 'allbutconstants':
+    var_list = ['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat',
+                'isfdraft_conc','theta_in','salinity_in','u_tide','melt_m_ice_per_y']
+    
 # INPUT
 # onlyTSdraft: 'corrected_isfdraft','theta_in','salinity_in'
 # TSdraftbotandiceddandwcd: 'corrected_isfdraft','theta_in','salinity_in','water_col_depth','theta_bot','salinity_bot'
@@ -68,12 +88,10 @@ if TS_opt == 'extrap':
     #data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
     #                            data_train_addvar1_norm[['rel_dGL']]])
     #data_train_norm = data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','isfdraft_conc','melt_m_ice_per_y']]
-    data_train_norm = data_train_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','isfdraft_conc',
-                                            'theta_in','salinity_in','u_tide','melt_m_ice_per_y']]
+    data_train_norm = data_train_orig_norm[var_list]
     #data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
     #                            data_val_addvar1_norm[['rel_dGL']]])
-    data_val_norm = data_val_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','isfdraft_conc',
-                                        'theta_in','salinity_in','u_tide','melt_m_ice_per_y']]
+    data_val_norm = data_val_orig_norm[var_list]
 
     
     ## prepare input and target
