@@ -95,7 +95,7 @@ for var in {isf_draft,Bathymetry_isf}
 do
 echo $var
 echo 'ncks > extract variable'
-ncks -O -C -v $var $path1/bi646c_YYYY1201_bathymetry-isf.nc  $path2/$var.nc
+ncks -O -C -v $var $path1/bf663c_YYYY1201_bathymetry-isf.nc  $path2/$var.nc # TO CHANGE WHEN DOING BF663 bf663c_YYYY1201_bathymetry-isf.nc #bi646c_YYYY1201_bathymetry-isf.nc
 echo 'ncks > put variable in file'
 ncks -A -C -v $var $path2/$var.nc $path2/mask_variables_of_interest_allyy.nc
 echo 'ncatted > put coords to lon lat'
@@ -112,13 +112,18 @@ cdo sellonlatbox,0,360,-90,-50 $path2/3D_depth_coord_setgrid.nc $path2/3D_depth_
 
 #### PREPARE LAND SEA MASK
 
-cdo sub -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc -selvar,isf_draft $path2/mask_variables_of_interest_allyy_Ant.nc  $path2/diff_bathy_draft.nc # difference bathymetry - isf draft
-cdo gtc,0 -selvar,isf_draft $path2/mask_variables_of_interest_allyy_Ant.nc $path2/isfdraft_gtc0.nc # identify where there is ice => 1
-cdo eqc,0 -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc $path2/bathy_0.nc # identify where there is ground without ice => 1
-cdo add $path2/bathy_0.nc $path2/isfdraft_gtc0.nc $path2/ice_1.nc # where there is ice and ground without ice => 1
-cdo eqc,0 $path2/diff_bathy_draft.nc $path2/diff_0.nc # where there is no ocean or floating ice shelf => 1
-cdo add $path2/ice_1.nc $path2/diff_0.nc $path2/lsmask_012.nc # land sea mask with 012
-# FOR FUTURE FORMATTING USE CRITERION OF CHECKING IF MAX(SALINITY) > 0 to check if this floating or grounded ice
+
+cdo eqc,0 -sellevidx,1 -selvar,so $path2/3D_variables_of_interest_allyy_Ant.nc $path2/ocean0.nc # where there is no open ocean => 1
+cdo eqc,0 -vertmax -selvar,so $path2/3D_variables_of_interest_allyy_Ant.nc $path2/ground1.nc # where there is no ocean or floating ice shelf => 1
+cdo add $path2/ground1.nc $path2/ocean0.nc $path2/lsmask_012.nc
+
+#OLD WAY 
+#cdo sub -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc -selvar,isf_draft $path2/mask_variables_of_interest_allyy_Ant.nc  $path2/diff_bathy_draft.nc # difference bathymetry - isf draft
+#cdo gtc,0 -selvar,isf_draft $path2/mask_variables_of_interest_allyy_Ant.nc $path2/isfdraft_gtc0.nc # identify where there is ice => 1
+#cdo eqc,0 -selvar,Bathymetry_isf $path2/mask_variables_of_interest_allyy_Ant.nc $path2/bathy_0.nc # identify where there is ground without ice => 1
+#cdo add $path2/bathy_0.nc $path2/isfdraft_gtc0.nc $path2/ice_1.nc # where there is ice and ground without ice => 1
+#cdo eqc,0 $path2/diff_bathy_draft.nc $path2/diff_0.nc 
+#cdo add $path2/ice_1.nc $path2/diff_0.nc $path2/lsmask_012.nc # land sea mask with 012
 
 #### SET LAND TO NAN AND NOT 0 IN TEMPERATURE AND SALINITY
 
@@ -127,5 +132,8 @@ cdo ifthen -selvar,so $path2/mask_for_ocean_through_salinity.nc -selvar,so $path
 cdo ifthen -selvar,so $path2/mask_for_ocean_through_salinity.nc -selvar,thetao $path2/3D_variables_of_interest_allyy_Ant.nc $path2/theta_allyy_Ant_withNaN.nc
 cdo merge -selvar,thetao $path2/theta_allyy_Ant_withNaN.nc -selvar,so $path2/salinity_allyy_Ant_withNaN.nc $path2/TandS_allyy_Ant_withNaN.nc
 
-cdo settaxis,1970-01-01,12:00:00,1year TandS_allyy_Ant_withNaN.nc TandS_allyy_Ant_withNaN_timeaxis.nc
-cdo splityear TandS_allyy_Ant_withNaN_timeaxis.nc TandS_allyy_Ant_withNaN_
+cdo settaxis,1970-01-01,12:00:00,1year $path2/TandS_allyy_Ant_withNaN.nc $path2/TandS_allyy_Ant_withNaN_timeaxis.nc
+cdo splityear $path2/TandS_allyy_Ant_withNaN_timeaxis.nc $path2/TandS_allyy_Ant_withNaN_
+
+cdo settaxis,1970-01-01,12:00:00,1year $path2/mask_variables_of_interest_allyy_Ant.nc $path2/mask_variables_of_interest_allyy_Ant_timeaxis.nc
+cdo settaxis,1970-01-01,12:00:00,1year $path2/lsmask_012.nc $path2/lsmask_012_timeaxis.nc
