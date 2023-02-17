@@ -39,6 +39,7 @@ exp_name = str(sys.argv[6])
 # TSTfdGLdIFwcd : 'corrected_isfdraft','theta_in','salinity_in','dGL','dIF','slope_ice_lon','slope_ice_lat','water_col_depth'
 # TSdraftslopereldGL : 'corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','rel_dGL'
 # allbutconstants : 'dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','isfdraft_conc','theta_in','salinity_in','u_tide'
+# newbasic : 'dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','theta_in','salinity_in'
 
 ######### READ IN DATA
 
@@ -80,12 +81,12 @@ if TS_opt == 'extrap':
     #data_train_norm = xr.merge([data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
     #                            data_train_addvar1_norm[['rel_dGL']]])
     #data_train_norm = data_train_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','isfdraft_conc','melt_m_ice_per_y']]
-    data_train_norm = data_train_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','isfdraft_conc',
-                                            'theta_in','salinity_in','u_tide','melt_m_ice_per_y']]
+    data_train_norm = data_train_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','theta_in','salinity_in',
+                                            'melt_m_ice_per_y']]
     #data_val_norm = xr.merge([data_val_orig_norm[['corrected_isfdraft','theta_in','salinity_in','slope_ice_lon','slope_ice_lat','melt_m_ice_per_y']], 
     #                            data_val_addvar1_norm[['rel_dGL']]])
-    data_val_norm = data_val_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','isfdraft_conc',
-                                        'theta_in','salinity_in','u_tide','melt_m_ice_per_y']]
+    data_val_norm = data_val_orig_norm[['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','theta_in','salinity_in',
+                                        'melt_m_ice_per_y']]
 
     
     ## prepare input and target
