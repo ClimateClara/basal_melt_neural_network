@@ -2,10 +2,10 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=medium  #'mini', 'small', 'medium', 'large', 'extra_large'
+mod_size=large  #'mini', 'small', 'medium', 'large', 'extra_large'
 TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
-exp_name=onlyTSdraftandslope
+exp_name=newbasic
 
 
 path_jobscripts=/bettik/burgardc/SCRIPTS/basal_melt_neural_networks/scripts/BASH/JOB_SCRIPTS/experiments
@@ -24,7 +24,7 @@ EOF
 
 chmod +x $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.sh
 
-oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.e%jobid% -l nodes=1/core=6,walltime=10:00:00 --project mais -p "network_address='luke60'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.sh
+oarsub -S -n ${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name} --stdout $path_jobid/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.o%jobid%  --stderr $path_jobid/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.e%jobid% -l nodes=1/core=6,walltime=10:00:00 --project mais -p "network_address='luke62'" $path_jobscripts/${mod_size}_${TS_opt}_${norm_method}_wholedataset_${exp_name}.sh
 
 # to remove if no CV!!!
 

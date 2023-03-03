@@ -47,6 +47,8 @@ elif exp_name == 'TSdraftslopereldGL':
 elif exp_name == 'allbutconstants':
     var_list = ['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat',
                 'isfdraft_conc','theta_in','salinity_in','u_tide','melt_m_ice_per_y']
+elif exp_name == 'newbasic':
+    var_list = ['dGL','dIF','corrected_isfdraft','bathy_metry','slope_bed_lon','slope_bed_lat','slope_ice_lon','slope_ice_lat','theta_in','salinity_in','melt_m_ice_per_y']
     
 # INPUT
 # onlyTSdraft: 'corrected_isfdraft','theta_in','salinity_in'
