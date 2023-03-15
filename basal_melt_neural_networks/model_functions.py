@@ -48,6 +48,29 @@ def get_model(size,shape,activ_fct,output_shape): #'mini', 'small', 'medium', 'l
     
     return model
 
+def get_custom_model(layer_nb,layer_size,shape,activ_fct,output_shape): #'mini', 'small', 'medium', 'large', 'extra_large'
+    
+    if activ_fct == 'LeakyReLU':
+        lrelu = lambda x: keras.activations.relu(x, alpha=0.1)
+    
+    model = keras.models.Sequential()
+    model.add(keras.layers.Input(shape, name="InputLayer"))
+    
+    for ll in range(1,layer_nb+1):
+        
+        if activ_fct == 'LeakyReLU':
+            model.add(keras.layers.Dense(layer_size, activation=lrelu, name='Dense_n'+str(ll)))
+        else:
+            model.add(keras.layers.Dense(layer_size, activation=activ_fct, name='Dense_n'+str(ll)))
+         
+    model.add(keras.layers.Dense(output_shape, name='Output'))
+
+    model.compile(optimizer = 'adam',
+                  loss      = 'mse',
+                  metrics   = ['mae', 'mse'] ) 
+    
+    return model
+
 
 
 
