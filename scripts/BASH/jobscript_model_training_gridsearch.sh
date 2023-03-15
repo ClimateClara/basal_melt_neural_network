@@ -2,8 +2,8 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-layer_nb=1 #'mini', 'small', 'medium', 'large', 'extra_large' # still need L and XL for both CV
-layer_size=128
+layer_nb=2 #'mini', 'small', 'medium', 'large', 'extra_large' # still need L and XL for both CV
+layer_size=256
 TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=newbasic
