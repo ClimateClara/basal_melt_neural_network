@@ -2,15 +2,15 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-layer_nb=2 #'mini', 'small', 'medium', 'large', 'extra_large' # still need L and XL for both CV
-layer_size=256
+layer_nb=5 #'mini', 'small', 'medium', 'large', 'extra_large' # still need L and XL for both CV
+layer_size=96
 TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=newbasic
 
 
-for ii in 10 11 12 13 18 22 23 24 25 30 31 33 38 39 40 42 43 44 45 47 48 51 52 53 54 55 58 61 65 66 69 70 71 73 75 # add 66 again
-#for ii in 10 11
+for ii in 10 11 12 13 18 22 23 24 25 30 31 33 38 39 40 42 43 44 45 47 48 51 52 53 54 55 58 61 65 66 69 70 71 73 75 
+#for ii in 73 75
 do
 isf_out=$ii
 #isf_out=00
