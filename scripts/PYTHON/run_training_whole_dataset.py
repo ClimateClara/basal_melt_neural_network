@@ -20,13 +20,17 @@ from tensorflow import keras
 import basal_melt_neural_networks.model_functions as modf
 import basal_melt_neural_networks.prep_input_data as indat
 
-
 ######### READ IN OPTIONS
 
 mod_size = str(sys.argv[1]) #'mini', 'small', 'medium', 'large', 'extra_large'
 TS_opt = str(sys.argv[2]) # extrap, whole, thermocline
 norm_method = str(sys.argv[3]) # std, interquart, minmax
 exp_name = str(sys.argv[4])
+seed_nb = int(sys.argv[5])
+
+np.random.seed(seed_nb)
+tf.set_random_seed(seed_nb)
+
 
 if exp_name == 'onlyTSdraft':
     var_list = ['corrected_isfdraft','theta_in','salinity_in','melt_m_ice_per_y']
