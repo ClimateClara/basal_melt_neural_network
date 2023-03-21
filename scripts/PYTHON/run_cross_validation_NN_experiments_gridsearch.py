@@ -148,7 +148,7 @@ else:
 ######### TRAIN THE MODEL
 
 input_size = x_train_norm.values.shape[0]
-activ_fct = 'LeakyReLU' #'relu' #LeakyReLU
+activ_fct = 'relu' #'relu' #LeakyReLU
 epoch_nb = 100
 batch_siz = 512
 

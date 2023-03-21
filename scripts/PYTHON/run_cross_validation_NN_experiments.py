@@ -21,6 +21,7 @@ import basal_melt_neural_networks.model_functions as modf
 import basal_melt_neural_networks.prep_input_data as indat
 
 
+
 ######### READ IN OPTIONS
 
 mod_size = str(sys.argv[1]) #'mini', 'small', 'medium', 'large', 'extra_large'
