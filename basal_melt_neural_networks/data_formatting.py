@@ -59,7 +59,8 @@ def prepare_input_df_1_year(TS_prof_isf, melt_rate_isf, yy, max_front_depth, geo
 
 
 def weighted_mean(data, dims, weights):
-    return (data*weights).sum(dim=dims)/weights.sum(dim=dims)
+    weight_sum = weights.sum(dim=dims) # to avoid dividing by zero
+    return (data*weights).sum(dim=dims)/weight_sum.where(weight_sum != 0)
 
 def create_stacked_mask(isfmask_2D, nisf_list, dims_to_stack, new_dim):
     # create stacked indices to select the different ice shelves
