@@ -102,13 +102,17 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
     train_input_df = None        
 
     for tt in tblock_list:
+        print(tt)
 
         for kisf in isf_list: 
-
+            
+            #print(kisf)
             clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
             clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
+            #print('here1')
             clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
-
+            
+            #print('here2')
             if train_input_df is None:
                 train_input_df = clean_ds_nrun_kisf.copy()
             else:
@@ -133,13 +137,18 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
     val_input_df = None        
 
     for tt in tt_val:
-
+        print(tt)
+        
         for kisf in isf_val: 
-
+            
+            #print(kisf)
             clean_df_nrun_kisf = pd.read_csv(inputpath_prof + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tt).zfill(3)+'.csv',index_col=[0,1,2])
+            #print('here3')
             clean_df_nrun_kisf.reset_index(drop=True, inplace=True)
+            #print('here4')
             clean_ds_nrun_kisf = clean_df_nrun_kisf.to_xarray()
 
+            #print('here5')
             if val_input_df is None:
                 val_input_df = clean_ds_nrun_kisf.copy()
             else:
@@ -148,7 +157,8 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
                 val_input_df = xr.concat([val_input_df, clean_ds_nrun_kisf], dim='index') 
 
     ## prepare input and target
-
+    
+    print('here6')
     y_train = train_input_df['melt_m_ice_per_y']
     x_train = train_input_df.drop_vars(['melt_m_ice_per_y'])
 
@@ -158,6 +168,7 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
     #print('x_train : ',dfmt.print_shape_xr_ds(x_train), 'y_train : ',len(y_train))
     #print('x_val  : ',dfmt.print_shape_xr_ds(x_val),  'y_test  : ',len(y_val))
 
+    print('here7')
     ## normalise
     norm_summary_list = []
 
@@ -166,11 +177,14 @@ def prepare_input_data_CV(tblock_dim, isf_dim, tblock_out, isf_out, TS_opt, inpu
         summary_ds = compute_norm_metrics(x_train, y_train, norm_method)
         norm_summary_list.append(summary_ds)
 
+    print('here8')
     summary_ds_all = xr.concat(norm_summary_list, dim='norm_method')
     
+    print('here9')
     var_mean = summary_ds_all.sel(metric='mean_vars')
     var_range = summary_ds_all.sel(metric='range_vars')
 
+    print('here10')
     var_train_norm = (train_input_df - var_mean)/var_range
     var_val_norm = (val_input_df - var_mean)/var_range
     
