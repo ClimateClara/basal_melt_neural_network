@@ -6,7 +6,7 @@ TS_opt=extrap # extrap, whole, thermocline
 
 
 for ii in 10 11 12 13 18 22 23 24 25 30 31 33 38 39 40 42 43 44 45 47 48 51 52 53 54 55 58 61 65 66 69 70 71 73 75 # do again from 48 on
-#for ii in 48 51 52 53 54 55 58 61 65 66 69 70 71 73 75
+#for ii in 31 33 38 39 40 42 43 44 45 47 48 51 52 53 54 55 58 61 65 66 69 70 71 73 75
 do
 isf_out=$ii
 #isf_out=00
@@ -32,7 +32,7 @@ EOF
 
 chmod +x $path_jobscripts/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.sh
 
-oarsub -S -n ${TS_opt}_noisf${isf_out}_notblock${tblock_out} --stdout $path_jobid/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.o%jobid%  --stderr $path_jobid/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.e%jobid% -l nodes=1/core=4,walltime=05:00:00 --project mais -p "network_address='luke62'" $path_jobscripts/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.sh
+oarsub -S -n ${TS_opt}_noisf${isf_out}_notblock${tblock_out} --stdout $path_jobid/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.o%jobid%  --stderr $path_jobid/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.e%jobid% -l nodes=1/core=2,walltime=05:00:00 --project mais -p "network_address='luke62'" $path_jobscripts/${TS_opt}_noisf${isf_out}_notblock${tblock_out}.sh
 
 # to remove if no CV!!!
 done
