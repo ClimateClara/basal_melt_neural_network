@@ -79,7 +79,7 @@ def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, inp
     x_val_norm = val_norm[input_vars]
     y_val_norm = val_norm['melt_m_ice_per_y']
 
-    y_out_norm = model.predict(x_val_norm.values)
+    y_out_norm = model.predict(x_val_norm.values,verbose = 0)
 
     y_out_norm_xr = xr.DataArray(data=y_out_norm.squeeze()).rename({'dim_0': 'index'})
     y_out_norm_xr = y_out_norm_xr.assign_coords({'index': x_val_norm.index})
@@ -95,7 +95,7 @@ def apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, inp
     # put some order in the file
     y_out_xr = y_out_pd_s.to_xarray()
     y_target_xr = y_target_pd_s.to_xarray()
-    y_to_compare = xr.merge([y_out_xr.T, y_target_xr.T]).sortby('y')
+    y_to_compare = xr.merge([y_out_xr, y_target_xr]).sortby('y')
 
     y_whole_grid = y_to_compare.reindex_like(file_isf['ISF_mask'])
     return y_whole_grid
@@ -166,8 +166,12 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
             norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
             
             df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_orig = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+            
             df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
             df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
+            df_nrun_addvar1 = df_nrun_addvar1.reorder_levels(['y', 'x', 'time'])
+
             df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
 
             model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
@@ -198,8 +202,12 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
             norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
             
             df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_orig = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+
             df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
             df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
+            df_nrun_addvar1 = df_nrun_addvar1.reorder_levels(['y', 'x', 'time'])
+            
             df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
 
             model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
@@ -250,7 +258,11 @@ def compute_crossval_metric_2D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
             norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
             
             df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_orig = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+
             df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = df_nrun_addvar1.reorder_levels(['y', 'x', 'time'])
+
             df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
             df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
 
@@ -283,7 +295,11 @@ def compute_crossval_metric_2D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
             norm_metrics = norm_metrics_file.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
             
             df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_orig = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+
             df_nrun_addvar1 = pd.read_csv(path_orig_data + 'dataframe_addvar1_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun_addvar1 = df_nrun_addvar1.reorder_levels(['y', 'x', 'time'])
+
             df_nrun_addvar1 = df_nrun_addvar1.drop(['salinity_in'], axis=1)
             df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
 
