@@ -29,7 +29,7 @@ exp_name = str(sys.argv[4])
 seed_nb = int(sys.argv[5])
 
 np.random.seed(seed_nb)
-tf.set_random_seed(seed_nb)
+tf.random.set_seed(seed_nb)
 
 
 if exp_name == 'onlyTSdraft':
@@ -169,7 +169,7 @@ model = modf.get_model(mod_size, input_size, activ_fct,1)
 
 
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=3, min_lr=0.0000001, min_delta=0.0005) #, min_delta=0.1
+                              patience=5, min_lr=0.0000001, min_delta=0.0005) #, min_delta=0.1
             
 early_stop = tf.keras.callbacks.EarlyStopping(
     monitor="val_loss",
@@ -202,11 +202,11 @@ print(time_end0)
 #    file.write('\n Reduce_lr: True')
 #    file.write('\n Early_stop: True')
 #    file.write('\n Training time (in s): '+str(timelength))
-model.save(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_wholedataset_TS'+TS_opt+'_norm'+norm_method+'.h5')
+model.save(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_wholedataset_'+str(seed_nb).zfill(2)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
 
 # convert the history.history dict to a pandas DataFrame:     
 hist_df = pd.DataFrame(history.history) 
 
-hist_csv_file = path_model + 'history_'+mod_size+'_'+exp_name+'_wholedataset_TS'+TS_opt+'_norm'+norm_method+'.csv'
+hist_csv_file = path_model + 'history_'+mod_size+'_'+exp_name+'_wholedataset_'+str(seed_nb).zfill(2)+'_TS'+TS_opt+'_norm'+norm_method+'.csv'
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
