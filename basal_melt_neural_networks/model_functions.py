@@ -14,6 +14,28 @@ def get_model(size,shape,activ_fct,output_shape): #'mini', 'small', 'medium', 'l
         model.add(keras.layers.Dense(32, activation=activ_fct, name='Dense_n1'))
         model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n2'))
         model.add(keras.layers.Dense(32, activation=activ_fct, name='Dense_n3'))
+        
+    elif size == 'small64':
+
+        model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n1'))
+        model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n2'))
+        model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n3'))
+
+    elif size == 'small96':
+
+        model.add(keras.layers.Dense(96, activation=activ_fct, name='Dense_n1'))
+        model.add(keras.layers.Dense(96, activation=activ_fct, name='Dense_n2'))
+        model.add(keras.layers.Dense(96, activation=activ_fct, name='Dense_n3'))
+        
+    if size == 'xsmall96':
+
+        model.add(keras.layers.Dense(96, activation=activ_fct, name='Dense_n1'))
+        model.add(keras.layers.Dense(96, activation=activ_fct, name='Dense_n2'))
+
+    if size == 'xsmall64':
+
+        model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n1'))
+        model.add(keras.layers.Dense(64, activation=activ_fct, name='Dense_n2'))
     
     elif size == 'medium':
 
