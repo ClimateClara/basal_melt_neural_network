@@ -112,7 +112,7 @@ def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_inf
 
     if box_charac_2D and box_charac_1D:
         box_loc_config2 = box_charac_2D['box_location'].sel(box_nb_tot=box_charac_1D['nD_config'].sel(config=2))
-        box1 = box_loc_config2.where(box_loc_config2==1).isel(Nisf=0).drop('Nisf')
+        box1 = box_loc_config2.where(box_loc_config2==1).isel(Nisf=1).drop('Nisf')
 
     geometry_isf_2D = dfmt.choose_isf(geometry_info_2D,isf_stack_mask, kisf)
     melt_rate_2D_isf_m_per_y = dfmt.choose_isf(melt2D,isf_stack_mask, kisf)
