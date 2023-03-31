@@ -6,7 +6,7 @@ mod_size=xsmall96  #'mini', 'small', 'medium', 'large', 'extra_large'
 TS_opt=extrap # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=newbasic2
-nemo_run=bf663
+nemo_run=bi646
 
 for vv in dGL dIF corrected_isfdraft bathy_metry slope_bed_lon slope_bed_lat slope_ice_lon slope_ice_lat theta_in salinity_in T_mean S_mean T_std S_std
 do 
