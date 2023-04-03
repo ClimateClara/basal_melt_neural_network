@@ -116,9 +116,42 @@ for tt in range(startyy,endyy):
         #df_nrun = pd.concat([df_nrun_orig,df_nrun_addvar1],join = 'outer', axis = 1)
 
         nrows = len(df_nrun.index)
-        shuffled_var = df_shuffled[vv].sample(n=nrows).values
-        df_nrun_in_shuffled = df_nrun.drop(vv, axis=1).copy()
-        df_nrun_in_shuffled[vv] = shuffled_var
+        if vv == 'watercolumn':
+            shuffled_var = df_shuffled[['corrected_isfdraft', 'bathy_metry']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['corrected_isfdraft', 'bathy_metry'], axis=1).copy()
+            df_nrun_in_shuffled['corrected_isfdraft'] = shuffled_var['corrected_isfdraft'].values
+            df_nrun_in_shuffled['bathy_metry'] = shuffled_var['bathy_metry'].values
+        elif vv == 'position':
+            shuffled_var = df_shuffled[['dGL', 'dIF']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['dGL', 'dIF'], axis=1).copy()
+            df_nrun_in_shuffled['dGL'] = shuffled_var['dGL'].values
+            df_nrun_in_shuffled['dIF'] = shuffled_var['dIF'].values
+        elif vv == 'slopesbed':
+            shuffled_var = df_shuffled[['slope_bed_lon', 'slope_bed_lat']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['slope_bed_lon', 'slope_bed_lat'], axis=1).copy()
+            df_nrun_in_shuffled['slope_bed_lon'] = shuffled_var['slope_bed_lon'].values
+            df_nrun_in_shuffled['slope_bed_lat'] = shuffled_var['slope_bed_lat'].values
+        elif vv == 'slopesice':
+            shuffled_var = df_shuffled[['slope_ice_lon', 'slope_ice_lat']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['slope_ice_lon', 'slope_ice_lat'], axis=1).copy()
+            df_nrun_in_shuffled['slope_ice_lon'] = shuffled_var['slope_ice_lon'].values
+            df_nrun_in_shuffled['slope_ice_lat'] = shuffled_var['slope_ice_lat'].values
+        elif vv == 'Tinfo':
+            shuffled_var = df_shuffled[['theta_in','T_mean','T_std']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['theta_in','T_mean','T_std'], axis=1).copy()
+            df_nrun_in_shuffled['theta_in'] = shuffled_var['theta_in'].values
+            df_nrun_in_shuffled['T_mean'] = shuffled_var['T_mean'].values
+            df_nrun_in_shuffled['T_std'] = shuffled_var['T_std'].values
+        elif vv == 'Sinfo':
+            shuffled_var = df_shuffled[['salinity_in','S_mean','S_std']].sample(n=nrows, random_state=1)
+            df_nrun_in_shuffled = df_nrun.drop(['salinity_in','S_mean','S_std'], axis=1).copy()
+            df_nrun_in_shuffled['salinity_in'] = shuffled_var['salinity_in'].values
+            df_nrun_in_shuffled['S_mean'] = shuffled_var['S_mean'].values
+            df_nrun_in_shuffled['S_std'] = shuffled_var['S_std'].values
+        else:
+            shuffled_var = df_shuffled[vv].sample(n=nrows, random_state=1).values
+            df_nrun_in_shuffled = df_nrun.drop(vv, axis=1).copy()
+            df_nrun_in_shuffled[vv] = shuffled_var
 
         ens_res2D_list = []
         for seed_nb in range(1,11):
