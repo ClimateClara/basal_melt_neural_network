@@ -2,14 +2,14 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=large  #'mini', 'small', 'medium', 'large', 'extra_large'
-TS_opt=extrap # extrap, whole, thermocline
+mod_size=large #'mini', 'small', 'medium', 'large', 'extra_large'
+TS_opt=extrap_shuffboth # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=newbasic2
 nemo_run=bf663
 
-#for vv in dGL dIF corrected_isfdraft bathy_metry slope_bed_lon slope_bed_lat slope_ice_lon slope_ice_lat theta_in salinity_in T_mean S_mean T_std S_std
-for vv in watercolumn position slopesbed slopesice Tinfo Sinfo #watercolumn 
+for vv in dGL dIF corrected_isfdraft bathy_metry slope_bed_lon slope_bed_lat slope_ice_lon slope_ice_lat theta_in salinity_in T_mean S_mean T_std S_std watercolumn position slopesbed slopesice Tinfo Sinfo
+#for vv in corrected_isfdraft bathy_metry slope_bed_lon slope_bed_lat slope_ice_lon slope_ice_lat theta_in salinity_in T_mean S_mean T_std S_std watercolumn position slopesbed slopesice Tinfo Sinfo #watercolumn 
 do 
 
 

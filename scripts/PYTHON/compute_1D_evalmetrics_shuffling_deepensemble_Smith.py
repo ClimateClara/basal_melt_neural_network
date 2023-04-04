@@ -42,14 +42,8 @@ tblock_dim = range(1980, 1980 + 60)
 
 inputpath_data_nn = '/bettik/burgardc/DATA/NN_PARAM/interim/INPUT_DATA/'
 
-if TS_opt == 'extrap':
-    inputpath_CVinput = inputpath_data_nn+'EXTRAPOLATED_ISFDRAFT_CHUNKS/'
-    inputpath_csv = inputpath_data_nn+'SMITH_'+nemo_run+'_EXTRAPDRAFT_CHUNKS/'
-elif TS_opt == 'whole':
-    inputpath_CVinput = inputpath_data_nn+'WHOLE_PROF_CHUNKS_CV/'
-    path_orig_data = inputpath_data_nn+'WHOLE_PROF_CHUNKS/'
-elif TS_opt == 'thermocline':
-    inputpath_CVinput = inputpath_data_nn+'THERMOCLINE_CHUNKS_CV/'
+inputpath_CVinput = inputpath_data_nn+'EXTRAPOLATED_ISFDRAFT_CHUNKS/'
+inputpath_csv = inputpath_data_nn+'SMITH_'+nemo_run+'_EXTRAPDRAFT_CHUNKS/'
 
 if exp_name == 'onlyTSdraft':
     input_vars = ['corrected_isfdraft','theta_in','salinity_in']
@@ -90,7 +84,13 @@ path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS/experiments/WHOLE
 startyy = 1980
 endyy = 1980 + 60
 
-df_shuffled = pd.read_csv(inputpath_csv + 'dataframe_shuffledinput_allisf_'+str(startyy)+'-'+str(endyy)+'_'+nemo_run+'.csv')
+if TS_opt == 'extrap_shuffboth':
+    if nemo_run == 'bf663':
+        df_shuffled = pd.read_csv(inputpath_data_nn+'SMITH_bi646_EXTRAPDRAFT_CHUNKS/dataframe_shuffledinput_allisf_'+str(startyy)+'-'+str(endyy)+'_bi646.csv')
+    elif nemo_run == 'bi646':
+        df_shuffled = pd.read_csv(inputpath_data_nn+'SMITH_bf663_EXTRAPDRAFT_CHUNKS/dataframe_shuffledinput_allisf_'+str(startyy)+'-'+str(endyy)+'_bf663.csv')
+else:
+    df_shuffled = pd.read_csv(inputpath_csv + 'dataframe_shuffledinput_allisf_'+str(startyy)+'-'+str(endyy)+'_'+nemo_run+'.csv')
 
 res_1D_allyy_list = []
 for tt in range(startyy,endyy):
@@ -155,8 +155,11 @@ for tt in range(startyy,endyy):
 
         ens_res2D_list = []
         for seed_nb in range(1,11):
-            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_wholedataset_'+str(seed_nb).zfill(2)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
-
+            if TS_opt == 'extrap_shuffboth':
+                model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_wholedataset_'+str(seed_nb).zfill(2)+'_TSextrap_norm'+norm_method+'.h5')
+            else:
+                model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_'+exp_name+'_wholedataset_'+str(seed_nb).zfill(2)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+                
             res_2D = pp.apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun_in_shuffled, model, input_vars)
 
             ens_res2D_list.append(res_2D.assign_coords({'seed_nb': seed_nb}))
