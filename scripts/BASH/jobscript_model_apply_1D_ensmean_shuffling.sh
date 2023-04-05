@@ -2,7 +2,7 @@
 
 ## RUN CROSS VALIDATION JOBS
 
-mod_size=large #'mini', 'small', 'medium', 'large', 'extra_large'
+mod_size=xsmall96 #'mini', 'small', 'medium', 'large', 'extra_large'
 TS_opt=extrap_shuffboth # extrap, whole, thermocline
 norm_method=std # std, interquart, minmax
 exp_name=newbasic2
