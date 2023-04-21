@@ -108,7 +108,7 @@ def evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_inf
     
     """
 
-    melt2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars, ensemble_mean)
+    melt2D = apply_NN_results_2D_1isf_1tblock(file_isf, norm_metrics, df_nrun, model, input_vars)
 
     if box_charac_2D and box_charac_1D:
         box_loc_config2 = box_charac_2D['box_location'].sel(box_nb_tot=box_charac_1D['nD_config'].sel(config=2))
