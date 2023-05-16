@@ -219,6 +219,80 @@ def compute_crossval_metric_1D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inp
             
     return res_1D_all
 
+def compute_crossval_metric_1D_for_1CV_woRossFRIS(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,input_vars=[],verbose=True):
+
+    """
+    Compute 1D metrics based on a given NN model for a given cross-validation axis
+    
+    """
+    
+    if ((isf_out > 0) and (tblock_out == 0)):
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS_WOROSSFRIS/CV_ISF/'
+        tblock_list = tblock_dim
+    elif ((tblock_out > 0) and (isf_out == 0)):     
+        path_model = '/bettik/burgardc/DATA/NN_PARAM/interim/NN_MODELS_WOROSSFRIS/CV_TBLOCK/'
+        isf_list = isf_dim
+    else:
+        raise ValueError("HELP, I DON'T KNOW HOW TO HANDLE AN ISF AND A TBLOCK OUT...")
+
+    res_1D_list = []
+    
+    # CV over shelves
+    if ((isf_out > 0) and (tblock_out == 0)):
+        
+        if verbose:
+            loop_list = tqdm(tblock_list)
+            print("Ok, we're doing cross-validation over ice shelves")
+        else:
+            loop_list = tblock_list
+            
+        for tblock in loop_list:
+            
+            nemo_run = identify_nemo_run_from_tblock(tblock)
+            file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+            
+            norm_metrics_file_orig = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_woRossFRIS.nc')
+            norm_metrics = norm_metrics_file_orig.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(isf_out).zfill(3)+'_'+str(tblock).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_1D = evalmetrics_1D_NN(isf_out, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, input_vars)
+            res_1D_list.append(res_1D)
+        
+        res_1D_all = xr.concat(res_1D_list, dim='time')
+    
+    # CV OVER TIME
+    elif ((tblock_out > 0) and (isf_out == 0)):
+        
+        nemo_run = identify_nemo_run_from_tblock(tblock_out)
+        file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask = read_input_evalmetrics_NN(nemo_run)
+
+        if verbose:
+            loop_list = tqdm(isf_list)
+            print("Ok, we're doing cross-validation over time")
+        else:
+            loop_list = isf_list
+        
+        for kisf in loop_list: 
+            
+            norm_metrics_file_orig = xr.open_dataset(inputpath_CVinput + 'metrics_norm_CV_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_woRossFRIS.nc')
+            norm_metrics = norm_metrics_file_orig.sel(norm_method=norm_method).drop('norm_method').to_dataframe()
+            
+            df_nrun_orig = pd.read_csv(path_orig_data + 'dataframe_input_isf'+str(kisf).zfill(3)+'_'+str(tblock_out).zfill(3)+'.csv',index_col=[0,1,2])
+            df_nrun = df_nrun_orig.reorder_levels(['y', 'x', 'time'])
+            
+            model = keras.models.load_model(path_model + 'model_nn_'+mod_size+'_noisf'+str(isf_out).zfill(3)+'_notblock'+str(tblock_out).zfill(3)+'_TS'+TS_opt+'_norm'+norm_method+'.h5')
+            
+            res_1D = evalmetrics_1D_NN(kisf, norm_metrics, df_nrun, model, file_isf, geometry_info_2D, box_charac_2D, box_charac_1D, isf_stack_mask, input_vars)    
+            res_1D_list.append(res_1D)
+        
+        res_1D_all = xr.concat(res_1D_list, dim='Nisf')
+            
+    return res_1D_all
+
 def compute_crossval_metric_2D_for_1CV(tblock_out,isf_out,tblock_dim,isf_dim,inputpath_CVinput,path_orig_data,norm_method,TS_opt,mod_size,path_model_end,input_vars=[],verbose=True):
 
     """
