@@ -318,7 +318,7 @@ def slope_zonal_merid(kisf, plume_var_of_int, ice_draft_neg, dx, dy):
         Grid spacing in the x-direction
     dy : float
         Grid spacing in the y-direction
-        
+    
     Returns
     -------
     merid_slope_whole_grid: xr.DataArray
