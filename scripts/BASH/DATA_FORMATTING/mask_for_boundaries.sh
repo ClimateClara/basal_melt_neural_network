@@ -7,8 +7,8 @@ homepath=/bettik/burgardc
 
 # name of NEMO run
 #nemo_run=EPM026
-nemo_run=EPM031
-#nemo_run=EPM034
+#nemo_run=EPM031
+nemo_run=EPM034
 
 
 ################# DECLARE THE PATHS ##############################
@@ -18,8 +18,8 @@ path5=$homepath/DATA/NN_PARAM/raw/
 ####################################################################
 
 #for yy in {2049..2058} #EPM026
-for yy in {2049..2058} #EPM031
-#for yy in {2119..2128} #EPM034
+#for yy in {2049..2058} #EPM031
+for yy in {2119..2128} #EPM034
 
 do
 cdo ifthenc,2 -subc,1 -selvar,tmask $path3/mask_variables_of_interest_Ant_"$yy".nc $path3/lsmask_0-2_Ant_withmiss.nc  

@@ -110,7 +110,8 @@ echo $yy
 echo 'cut variable file'
 cdo sellonlatbox,0,360,-90,-50 $path3/variables_of_interest_"$yy".nc $path3/variables_of_interest_"$yy"_Ant.nc
 echo 'cut mask file'
-cdo setgrid,$path3/variables_of_interest_2049.nc $path3/mask_variables_of_interest_"$yy".nc $path3/mask_variables_of_interest_setgrid_"$yy".nc
+#cdo setgrid,$path3/variables_of_interest_2049.nc $path3/mask_variables_of_interest_"$yy".nc $path3/mask_variables_of_interest_setgrid_"$yy".nc
+cdo setgrid,$path3/variables_of_interest_2119.nc $path3/mask_variables_of_interest_"$yy".nc $path3/mask_variables_of_interest_setgrid_"$yy".nc
 cdo sellonlatbox,0,360,-90,-50 $path3/mask_variables_of_interest_setgrid_"$yy".nc $path3/mask_variables_of_interest_Ant_"$yy".nc
 done
 
